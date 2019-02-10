@@ -70,6 +70,7 @@ function menu_withgui(){
 					modificacion=`echo $ruta_menuzen | sed 's/\//-/g'`
 
 					#crea una copia completa de la ruta seleccionada por el usuario
+					cd /home/$usuario/Snap
 					tar -czvf "$fecha""_completa""$modificacion".tar.gz "$ruta_menuzen"
 
 					#si no existe la carpeta /Snap se crea
@@ -81,6 +82,7 @@ function menu_withgui(){
 					modificacion=`echo $ruta_menuzen | sed 's/\//-/g'`
 
 					#crea una copia completa de la ruta seleccionada por el usuario
+					cd /home/$usuario/Snap
 					tar -czvf "$fecha""_completa""$modificacion".tar.gz "$ruta_menuzen"
 
 					fi ;;
@@ -116,7 +118,6 @@ function menu_withgui(){
 							else
 
 								#crea una copia incremental
-
 								tar -czvf "$fecha""_incremental""$modificacion".tar.gz --listed-incremental=/home/$usuario/Snap/$new_cortar.snap "$ruta_menuzen"
 
 						fi
@@ -126,61 +127,12 @@ function menu_withgui(){
 
 						mkdir /home/$usuario/Snap
 
-						#creamos un archivo que nos va a permitir ayudarnos a la hora de crear copias diferenciales
-						echo "Completa `date`"" $ruta_menuzen" >> "/home/$usuario/Snap/Fullbackup"
+						#Creamos una copia completa ya que es la primera que se creara
+						tar -czvf "$fecha""_incremental""$modificacion".tar.gz "$ruta_menuzen"
 
-						#crea una copia incremental que llamaremos "cmpleta" de la ruta seleccionada por el usuario, ya que no existe ninguna incremental de la ruta
-							tar --create \
-								--file="$fecha""_completa""$modificacion".tar \
-								--listed-incremental=/home/$usuario/Snap/"$new_cortar".snap \
-								$cortar
-
-							echo "Se ha realizado una copia completa, ya que no existia ninguna incremental previa"
+						echo "Se ha realizado una copia completa, ya que no existia ninguna incremental previa"
 
 				fi ;;
-
-			"Copia diferencial") ruta_menuzen=$(zenity --file-selection --directory)
-		
-				fecha_menuzen=$(zenity --text "Elige una fecha desde la que realizar la copia " --calendar)
-				conversion_fecha1=`echo $fecha_menuzen | cut -d"/" -f1`
-				conversion_fecha2=`echo $fecha_menuzen | cut -d"/" -f2`
-
-				if [[ $conversion_fecha2 == "01" ]]; then
-					mes="jan"
-				elif [[ $conversion_fecha2 == "02" ]]; then
-						mes="feb"
-				elif [[ $conversion_fecha2 == "03" ]]; then
-						mes="mar"
-				elif [[ $conversion_fecha2 == "04" ]]; then
-						mes="apr"
-				elif [[ $conversion_fecha2 == "05" ]]; then
-						mes="may"
-				elif [[ $conversion_fecha2 == "06" ]]; then
-						mes="jun"
-				elif [[ $conversion_fecha2 == "07" ]]; then
-						mes="jul"
-				elif [[ $conversion_fecha2 == "08" ]]; then
-						mes="aug"
-				elif [[ $conversion_fecha2 == "09" ]]; then
-						mes="sep"
-				elif [[ $conversion_fecha2 == "10" ]]; then
-						mes="oct"
-				elif [[ $conversion_fecha2 == "11" ]]; then
-						mes="nov"
-				elif [[ $conversion_fecha2 == "12" ]]; then
-						mes="dic"
-				fi
-
-				conversion_fecha3=`echo $fecha_menuzen | cut -d"/" -f3`
-
-				#Las siguientes variables sirven para cortar la ultima ruta seleccionada por el usuario
-				modificacion=`echo $ruta_menuzen | sed 's/\//-/g'`
-				linea=`echo $ruta_menuzen | grep -o "/" | wc -l`
-				ultimo=`expr $linea + 1`
-				cortar=`echo $ruta_menuzen | cut -d "/" -f$ultimo`
-
-				tar -cpvzf "$fecha""_diferencial""$modificacion".tar "$cortar" -N $conversion_fecha1"$mes""20"$conversion_fecha3
-				;;
 
 		esac
 			;;
